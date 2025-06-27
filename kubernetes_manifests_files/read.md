@@ -20,6 +20,7 @@ kubectl adm policy add-scc-to-user confluent-scc -z confluent-for-kubernetes -n 
 #### dowlnoad the confluent operator from confluent website 
 
 curl -O https://packages.confluent.io/bundle/cfk/confluent-for-kubernetes-2.9.3.tar.gz
+
 tar -xvzf confluent-for-kubernetes-2.9.3.tar.gz
 
 cd /home/confluent/confluent-for-kubernetes-2.9.3-20240911/helm
