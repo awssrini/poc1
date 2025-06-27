@@ -1,0 +1,64 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: ControlCenter
+metadata:
+  name: controlcenter
+  namespace: confluent
+spec:
+  id: 1
+  configOverrides:
+    server:
+      - confluent.controlcenter.schema.registry.enable=false
+    log4j:
+     - "log4j.appender.stdout.filter.01=org.apache.log4j.varia.StringMatchFilter"
+     - "log4j.appender.stdout.filter.01.StringToMatch=ChannelReap"
+     - "log4j.appender.stdout.filter.01.AcceptOnMatch=false"
+    jvm:
+     - -Djavax.net.ssl.trustStore=/mnt/secrets/ldaps-tls/truststore.jks
+     - -Djavax.net.ssl.trustStorePassword=e245acd1284a
+  replicas: 1
+  image:
+    application: confluentinc/cp-enterprise-control-center:7.7.1
+    init: confluentinc/confluent-init-container:2.9.3
+  dataVolumeCapacity: 5Gi
+  storageClass:
+    name: lvms-vg1
+  license:
+    globalLicense: true
+  authentication:
+    type: basic
+    basic:
+      roles:
+       - Administrators
+       - Readonly
+      restrictedRoles:
+       - Readonly
+      secretRef: basicsecret
+  podTemplate:
+    spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
+        allowPrivilegeEscalation: false
+        seccompProfile:
+          type: RuntimeDefault
+    probe:
+      liveness:
+        periodSeconds: 10
+        failureThreshold: 5
+        timeoutSeconds: 500
+    resources:
+      limits:
+        cpu: 2
+        memory: 2Gi
+      requests:
+        cpu: 2
+        memory: 1Gi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - confluent

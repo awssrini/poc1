@@ -1,0 +1,56 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Kafka
+metadata:
+  name: kafka
+  namespace: confluent
+spec:
+  configOverrides:
+    server:
+      - confluent.balancer.heal.uneven.load.trigger=ANY_UNEVEN_LOAD
+  replicas: 1
+  image:
+    application: confluentinc/cp-server:7.7.1
+    init: confluentinc/confluent-init-container:2.9.3
+  dataVolumeCapacity: 5Gi
+  storageClass:
+    name: lvms-vg1
+  metricReporter:
+    enabled: true
+  dependencies:
+    kRaftController:
+      clusterRef:
+        name: kraftcontroller
+        namespace: confluent
+  podTemplate:
+    spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
+        allowPrivilegeEscalation: false
+        seccompProfile:
+          type: RuntimeDefault
+    resources:
+      limits:
+        cpu: 2
+        memory: 2Gi
+      requests: 
+        cpu: 2
+        memory: 1Gi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - confluent
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - kafka
+          topologyKey: "kubernetes.io/hostname"

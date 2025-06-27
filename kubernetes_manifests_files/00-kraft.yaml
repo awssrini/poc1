@@ -1,0 +1,49 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KRaftController
+metadata:
+  name: kraftcontroller
+  namespace: confluent
+spec:
+  configOverrides:
+    server:
+      - confluent.balancer.enable=true
+  dataVolumeCapacity: 1Gi
+  image:
+    application: confluentinc/cp-server:7.7.1
+    init: confluentinc/confluent-init-container:2.9.3
+  replicas: 1
+  storageClass:
+    name: lvms-vg1
+  podTemplate:
+    spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
+        allowPrivilegeEscalation: false
+        seccompProfile:
+          type: RuntimeDefault
+    resources:
+      limits:
+        cpu: 2
+        memory: 2Gi
+      requests: 
+        cpu: 2
+        memory: 1Gi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - confluent
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - kraftcontroller
+          topologyKey: "kubernetes.io/hostname"
