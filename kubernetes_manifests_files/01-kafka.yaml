@@ -9,8 +9,8 @@ spec:
       - confluent.balancer.heal.uneven.load.trigger=ANY_UNEVEN_LOAD
   replicas: 1
   image:
-    application: confluentinc/cp-server:7.7.1
-    init: confluentinc/confluent-init-container:2.9.3
+    application: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/confluentinc/cp-server:7.7.1"
+    init: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/confluentinc/confluent-init-container:2.9.3"
   dataVolumeCapacity: 5Gi
   storageClass:
     name: lvms-vg1

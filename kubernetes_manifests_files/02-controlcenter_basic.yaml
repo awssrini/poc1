@@ -17,8 +17,8 @@ spec:
      - -Djavax.net.ssl.trustStorePassword=e245acd1284a
   replicas: 1
   image:
-    application: confluentinc/cp-enterprise-control-center:7.7.1
-    init: confluentinc/confluent-init-container:2.9.3
+    application: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/confluentinc/cp-enterprise-control-center:7.7.1"
+    init: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/confluentinc/confluent-init-container:2.9.3"
   dataVolumeCapacity: 5Gi
   storageClass:
     name: lvms-vg1
