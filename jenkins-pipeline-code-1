@@ -6,7 +6,7 @@ pipeline {
         AWS_ECR_REPO_NAME  = credentials('ECR_REPO_CFK')        // e.g., confluentinc/cp-server
         AWS_DEFAULT_REGION = 'ap-southeast-1'
         REPOSITORY_URI     = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-        EKS_CLUSTER_NAME   = 'your-eks-cluster-name'            // 🔁 Replace with your actual cluster name
+        EKS_CLUSTER_NAME   = 'dev-medium-eks-cluster'            // 🔁 Replace with your actual cluster name
     }
 
     stages {
@@ -76,7 +76,7 @@ stage('Trivy Image Scan') {
                 curl -O https://packages.confluent.io/bundle/cfk/confluent-for-kubernetes-2.9.3.tar.gz
                 tar -xvzf confluent-for-kubernetes-2.9.3.tar.gz
                 cd confluent-for-kubernetes-2.9.3-*/helm
-                helm upgrade --install confluent-operator --namespace confluent confluent-for-kubernetes --set kRaftEnabled=true -f values.yaml
+                helm upgrade --install confluent-operator --namespace confluent confluent-for-kubernetes --set kRaftEnabled=true
                 '''
             }
         }
