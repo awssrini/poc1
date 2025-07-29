@@ -13,15 +13,8 @@ spec:
     init: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/confluentinc/confluent-init-container:2.9.3"
   replicas: 1
   storageClass:
-    name: lvms-vg1
+    name: gp2
   podTemplate:
-    spec:
-      securityContext:
-        runAsUser: 1001
-        fsGroup: 1001
-        allowPrivilegeEscalation: false
-        seccompProfile:
-          type: RuntimeDefault
     resources:
       limits:
         cpu: 2

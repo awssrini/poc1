@@ -21,7 +21,7 @@ spec:
     init: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/confluentinc/confluent-init-container:2.9.3"
   dataVolumeCapacity: 5Gi
   storageClass:
-    name: lvms-vg1
+    name: gp2
   license:
     globalLicense: true
   authentication:
@@ -34,13 +34,6 @@ spec:
        - Readonly
       secretRef: basicsecret
   podTemplate:
-    spec:
-      securityContext:
-        runAsUser: 1001
-        fsGroup: 1001
-        allowPrivilegeEscalation: false
-        seccompProfile:
-          type: RuntimeDefault
     probe:
       liveness:
         periodSeconds: 10
