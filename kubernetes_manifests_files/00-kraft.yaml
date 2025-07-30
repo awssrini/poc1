@@ -31,12 +31,3 @@ spec:
                 operator: In
                 values:
                   - confluent
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app
-              operator: In
-              values:
-              - kraftcontroller
-          topologyKey: "kubernetes.io/hostname"
