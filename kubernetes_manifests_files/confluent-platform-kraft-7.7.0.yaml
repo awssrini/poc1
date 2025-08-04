@@ -104,7 +104,9 @@ spec:
     type: loadBalancer
     loadBalancer:
       domain: confluent.svc.cluster.local
-      prefix: controlcenter  
+      prefix: controlcenter
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
