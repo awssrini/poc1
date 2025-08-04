@@ -79,6 +79,8 @@ spec:
     application: confluentinc/cp-ksqldb-server:7.7.0
     init: confluentinc/confluent-init-container:2.9.0
   dataVolumeCapacity: 10Gi
+  storageClass:
+    name: gp2
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
