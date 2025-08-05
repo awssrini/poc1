@@ -1,0 +1,45 @@
+# Package: https://packages.confluent.io/bundle/cfk/confluent-for-kubernetes-2.9.6.tar.gz
+docker.io/confluentinc/confluent-init-container:2.9.6
+docker.io/confluentinc/cp-enterprise-control-center:7.7.4
+docker.io/confluentinc/cp-enterprise-replicator:7.7.4
+docker.io/confluentinc/cp-kafka-rest:7.7.4
+docker.io/confluentinc/cp-ksqldb-server:7.7.4
+docker.io/confluentinc/cp-schema-registry:7.7.4
+docker.io/confluentinc/cp-server-connect:7.7.4
+docker.io/confluentinc/cp-server:7.7.4
+docker.io/confluentinc/confluent-operator:0.1033.87
+
+# Package: https://packages.confluent.io/bundle/cfk/confluent-for-kubernetes-2.10.2.tar.gz
+docker.io/confluentinc/confluent-init-container:2.10.2
+docker.io/confluentinc/cp-enterprise-control-center:7.8.3
+docker.io/confluentinc/cp-enterprise-replicator:7.8.3
+docker.io/confluentinc/cp-kafka-rest:7.8.3
+docker.io/confluentinc/cp-ksqldb-server:7.8.3
+docker.io/confluentinc/cp-schema-registry:7.8.3
+docker.io/confluentinc/cp-server-connect:7.8.3
+docker.io/confluentinc/cp-server:7.8.3
+docker.io/confluentinc/confluent-operator:0.1145.50
+
+# Package: https://packages.confluent.io/bundle/cfk/confluent-for-kubernetes-2.11.2.tar.gz
+docker.io/confluentinc/confluent-init-container:2.11.2
+docker.io/confluentinc/cp-enterprise-control-center:7.9.2
+docker.io/confluentinc/cp-enterprise-replicator:7.9.2
+docker.io/confluentinc/cp-kafka-rest:7.9.2
+docker.io/confluentinc/cp-ksqldb-server:7.9.2
+docker.io/confluentinc/cp-schema-registry:7.9.2
+docker.io/confluentinc/cp-server-connect:7.9.2
+docker.io/confluentinc/cp-server:7.9.2
+docker.io/confluentinc/confluent-operator:0.1193.47
+
+# Package: https://packages.confluent.io/bundle/cfk/confluent-for-kubernetes-3.0.0.tar.gz
+docker.io/confluentinc/confluent-init-container:3.0.0
+docker.io/confluentinc/cp-enterprise-alertmanager:2.2.0
+docker.io/confluentinc/cp-enterprise-control-center:8.0.0
+docker.io/confluentinc/cp-enterprise-prometheus:2.2.0
+docker.io/confluentinc/cp-enterprise-replicator:8.0.0
+docker.io/confluentinc/cp-kafka-rest:8.0.0
+docker.io/confluentinc/cp-ksqldb-server:8.0.0
+docker.io/confluentinc/cp-schema-registry:8.0.0
+docker.io/confluentinc/cp-server-connect:8.0.0
+docker.io/confluentinc/cp-server:8.0.0
+docker.io/confluentinc/confluent-operator:0.1263.8
