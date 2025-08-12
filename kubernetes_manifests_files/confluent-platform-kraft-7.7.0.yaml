@@ -8,8 +8,8 @@ spec:
   storageClass:
     name: gp2
   image:
-    application: docker.io/confluentinc/cp-server:7.7.0
-    init: confluentinc/confluent-init-container:2.9.0
+    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-server:7.7.4
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:2.9.6
   replicas: 1
 ---
 apiVersion: platform.confluent.io/v1beta1
@@ -20,8 +20,8 @@ metadata:
 spec:
   replicas: 3
   image:
-    application: confluentinc/cp-server:7.7.0
-    init: confluentinc/confluent-init-container:2.9.0
+    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-server:7.7.4
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:2.9.6
   dataVolumeCapacity: 10Gi
   storageClass:
     name: gp2
@@ -43,8 +43,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-server-connect:7.7.0
-    init: confluentinc/confluent-init-container:2.9.0
+    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-server-connect:7.7.4
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:2.9.6
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
@@ -60,8 +60,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-enterprise-replicator:7.7.0
-    init: confluentinc/confluent-init-container:2.9.0
+    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-enterprise-replicator:7.7.4
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:2.9.6
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
@@ -76,8 +76,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-ksqldb-server:7.7.0
-    init: confluentinc/confluent-init-container:2.9.0
+    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-ksqldb-server:7.7.4
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:2.9.6
   dataVolumeCapacity: 10Gi
   storageClass:
     name: gp2
@@ -95,8 +95,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-enterprise-control-center:7.7.0
-    init: confluentinc/confluent-init-container:2.9.0
+    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-enterprise-control-center:7.7.4
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:2.9.6
   dataVolumeCapacity: 10Gi
   storageClass:
     name: gp2
@@ -130,8 +130,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-schema-registry:7.7.0
-    init: confluentinc/confluent-init-container:2.9.0
+    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-schema-registry:7.7.4
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:2.9.6
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
@@ -148,8 +148,8 @@ spec:
     schemaRegistry:
       url: http://schemaregistry.confluent.svc.cluster.local:8081
   image:
-    application: confluentinc/cp-kafka-rest:7.7.0
-    init: confluentinc/confluent-init-container:2.9.0
+    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-kafka-rest:7.7.4
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:2.9.6
   replicas: 1
   podTemplate:
     podSecurityContext:
