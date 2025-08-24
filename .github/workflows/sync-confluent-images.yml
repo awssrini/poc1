@@ -1,0 +1,78 @@
+name: Sync Confluent Images to ECR
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch: # allows manual trigger
+
+jobs:
+  sync-images:
+    runs-on: ubuntu-latest
+    env:
+      REPO_API: "https://api.github.com/repos/confluentinc/confluent-kubernetes-examples/contents/general/cp-version"
+      LAST_SEEN_FILE: "last_seen_sha.txt"
+      AWS_REGION: "<your-aws-region>"
+      AWS_ACCOUNT_ID: "<your-aws-account-id>"
+      ECR_REPO_PREFIX: "<your-ecr-repo-prefix>"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq yq skopeo curl
+
+      - name: Get last seen SHA
+        id: last_seen
+        run: |
+          if [ -f "$LAST_SEEN_FILE" ]; then
+            echo "sha=$(cat $LAST_SEEN_FILE)" >> $GITHUB_OUTPUT
+          else
+            echo "sha=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: List files from Confluent GitHub
+        id: list_files
+        run: |
+          curl -s $REPO_API | jq -r '.[] | select(.name | test("confluent-platform-kraft-.*\\.yaml")) | "\(.name) \(.sha) \(.download_url)"' > files_list.txt
+
+      - name: Find new files
+        id: new_files
+        run: |
+          NEW_FILES=$(awk -v last_sha="${{ steps.last_seen.outputs.sha }}" '{if ($2 != last_sha) print $0}' files_list.txt)
+          echo "$NEW_FILES" > new_files.txt
+          echo "new_files=$(cat new_files.txt)" >> $GITHUB_OUTPUT
+
+      - name: Download and process new files
+        if: steps.new_files.outputs.new_files != ''
+        run: |
+          while read -r file sha url; do
+            echo "Processing $file"
+            curl -s -O "$url"
+
+            # Extract image names using yq
+            IMAGES=$(yq eval '.spec.template.spec.containers[].image' "$file")
+            
+            for image in $IMAGES; do
+              echo "Copying $image to AWS ECR"
+
+              # Prepare ECR target
+              IMAGE_NAME=$(basename $image)
+              TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
+
+              # Copy image using skopeo
+              skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
+            done
+          done < new_files.txt
+
+      - name: Update last seen SHA
+        run: |
+          # Update SHA of latest file
+          LATEST_SHA=$(awk '{print $2}' files_list.txt | sort | tail -n1)
+          echo $LATEST_SHA > $LAST_SEEN_FILE
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add $LAST_SEEN_FILE
+          git commit -m "Update last seen SHA"
+          git push
