@@ -21,13 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget curl git
-          # Install Go yq (v4)
-          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-          chmod +x /usr/bin/yq
-          yq --version
-          # Install skopeo
-          sudo apt-get install -y skopeo
+          sudo apt-get install -y jq yq skopeo curl
 
       - name: Fetch YAML list from Confluent GitHub
         run: |
