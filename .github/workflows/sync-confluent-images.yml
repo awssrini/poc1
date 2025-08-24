@@ -2,8 +2,8 @@ name: Sync Confluent Images to ECR
 
 on:
   schedule:
-    - cron: "0 2 * * *" # daily at 02:00 UTC
-  workflow_dispatch: # allow manual trigger
+    - cron: "0 2 * * *"  # daily at 02:00 UTC
+  workflow_dispatch:           # manual trigger
 
 jobs:
   sync-images:
@@ -21,7 +21,13 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq yq skopeo curl
+          sudo apt-get install -y wget curl git jq skopeo
+          # Remove old Python yq if exists
+          sudo pip uninstall -y yq || true
+          # Install Go yq v4
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+          yq --version
 
       - name: Fetch YAML list from Confluent GitHub
         run: |
@@ -29,9 +35,7 @@ jobs:
 
       - name: Detect new files
         run: |
-          # create last_seen_sha.txt if not exists
           touch $LAST_SEEN_FILE
-          # compare SHA to find new files
           awk 'NR==FNR{seen[$2]; next} !($2 in seen)' "$LAST_SEEN_FILE" files_list.txt > new_files.txt
           echo "New files to process:"
           cat new_files.txt
@@ -43,7 +47,7 @@ jobs:
             curl -s -O "$url"
 
             # Extract all images (application, init, services)
-            IMAGES=$(yq eval '.. | select(has("image")) | .image | .. | select(tag == "!!str")' "$file" | sort -u)
+            IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file")
 
             for image in $IMAGES; do
               echo "Copying $image to AWS ECR"
