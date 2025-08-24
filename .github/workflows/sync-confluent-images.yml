@@ -63,5 +63,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add $LAST_SEEN_FILE
-          git commit -m "Update last seen SHA"
-          git push
+          git commit -m "Update last seen SHA" || echo "No changes to commit"
+          git push || echo "Nothing to push"
