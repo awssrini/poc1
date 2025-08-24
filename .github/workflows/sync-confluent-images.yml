@@ -54,6 +54,7 @@ jobs:
               IMAGE_NAME=$(basename $image)
               TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
               echo $TARGET_IMAGE
+            #   skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE              
             done
           done < new_files.txt
 
