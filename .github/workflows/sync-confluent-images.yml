@@ -2,8 +2,8 @@ name: Sync Confluent Images to ECR
 
 on:
   schedule:
-    - cron: "0 2 * * *"  # daily at 02:00 UTC
-  workflow_dispatch:
+    - cron: "0 2 * * *" # daily at 02:00 UTC
+  workflow_dispatch: # allow manual trigger
 
 jobs:
   sync-images:
@@ -21,25 +21,25 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq yq skopeo curl
+          sudo apt-get install -y wget curl git
+          # Install Go yq (v4)
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          chmod +x /usr/bin/yq
+          yq --version
+          # Install skopeo
+          sudo apt-get install -y skopeo
 
-      - name: Get last seen SHA
-        id: last_seen
-        run: |
-          if [ -f "$LAST_SEEN_FILE" ]; then
-            cat $LAST_SEEN_FILE
-          else
-            touch $LAST_SEEN_FILE
-          fi
-
-      - name: List files from GitHub
+      - name: Fetch YAML list from Confluent GitHub
         run: |
           curl -s $REPO_API | jq -r '.[] | select(.name | test("confluent-platform-kraft-.*\\.yaml")) | "\(.name) \(.sha) \(.download_url)"' > files_list.txt
 
-      - name: Find new files
+      - name: Detect new files
         run: |
+          # create last_seen_sha.txt if not exists
+          touch $LAST_SEEN_FILE
+          # compare SHA to find new files
           awk 'NR==FNR{seen[$2]; next} !($2 in seen)' "$LAST_SEEN_FILE" files_list.txt > new_files.txt
-          echo "Found new files:"
+          echo "New files to process:"
           cat new_files.txt
 
       - name: Process new files and copy images
@@ -48,8 +48,11 @@ jobs:
             echo "Processing $file"
             curl -s -O "$url"
 
-            IMAGES=$(yq eval '.spec.template.spec.containers[].image' "$file")
+            # Extract all images (application, init, services)
+            IMAGES=$(yq eval '.. | select(has("image")) | .image | .. | select(tag == "!!str")' "$file" | sort -u)
+
             for image in $IMAGES; do
+              echo "Copying $image to AWS ECR"
               IMAGE_NAME=$(basename $image)
               TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
               skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
@@ -57,4 +60,10 @@ jobs:
           done < new_files.txt
 
       - name: Update last seen SHA
-        run: cp files_list.txt $LAST_SEEN_FILE && git add $LAST_SEEN_FILE && git commit -m "Update last seen SHA" && git push
+        run: |
+          cp files_list.txt $LAST_SEEN_FILE
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add $LAST_SEEN_FILE
+          git commit -m "Update last seen SHA"
+          git push
