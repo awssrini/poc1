@@ -43,50 +43,35 @@ jobs:
 
       - name: Process new files and copy images
         run: |
-          > synced-images.txt   # reset each run (remove if you want to keep history)
+          > synced-images.txt   # reset each run
           while read -r file sha url; do
             echo "Processing $file"
-            curl -s -O "$url"
+
+            # Download YAML if not already present
+            curl -sf -O "$url"
 
             # Extract all images
             IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file")
+
             for image in $IMAGES; do
               echo "Copying $image to AWS ECR"
-              IMAGE_NAME=$(basename $image)
+              IMAGE_NAME=$(basename "$image")
               TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
 
               # Log to console
               echo $TARGET_IMAGE
 
-              # Save to file
+              # Save to synced-images.txt for future reference
               echo $TARGET_IMAGE >> synced-images.txt
 
               # Uncomment for real copy:
               # skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
-            done
-          done < new_files.txt
 
-      - name: Rewrite YAMLs with ECR images
-        run: |
-          while read -r file sha url; do
-            echo "Rewriting $file with ECR image URLs"
-
-            # Ensure we have the YAML locally
-            if [ ! -f "$file" ]; then
-              curl -s -O "$url"
-            fi
-
-            IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file")
-            for image in $IMAGES; do
-              IMAGE_NAME=$(basename $image)
-              TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
-              echo "Replacing $image → $TARGET_IMAGE"
-
-              # Use '|=' instead of '=' to substitute strings correctly
-              yq eval -i "(.. | select(has(\"image\")) | .image |= sub(\"$image\"; \"$TARGET_IMAGE\"))" "$file"
+              # Replace original image with ECR image in the YAML directly
+              sed -i "s|$image|$TARGET_IMAGE|g" "$file"
             done
 
-            echo "✅ Updated $file"
+            echo "✅ Updated $file with ECR images"
           done < new_files.txt
 
       - name: Update last seen SHA
