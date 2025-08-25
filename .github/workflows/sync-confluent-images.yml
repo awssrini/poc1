@@ -29,55 +29,38 @@ jobs:
           wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
           chmod +x /usr/local/bin/yq
           yq --version
-
       - name: Fetch YAML list from Confluent GitHub
         run: |
           curl -s $REPO_API | jq -r '.[] | select(.name | test("confluent-platform-kraft-.*\\.yaml")) | "\(.name) \(.sha) \(.download_url)"' > files_list.txt
-
       - name: Detect new files
         run: |
           touch $LAST_SEEN_FILE
           awk 'NR==FNR{seen[$2]; next} !($2 in seen)' "$LAST_SEEN_FILE" files_list.txt > new_files.txt
           echo "New files to process:"
           cat new_files.txt
-
       - name: Process new files and copy images
         run: |
           > synced-images.txt   # reset each run
           while read -r file sha url; do
             echo "Processing $file"
-
-            cd confluent-platform-manifests_files
             # Download YAML if not already present
             curl -sf -O "$url"
-
             # Extract all images and keep unique entries
             IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file" | sort -u)
-
             for image in $IMAGES; do
               IMAGE_NAME=$(basename "$image")
               TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
-
               # Log to console
               echo "Copying $image → $TARGET_IMAGE"
-
               # Save to synced-images.txt, avoid duplicates
               grep -qxF "$TARGET_IMAGE" synced-images.txt || echo "$TARGET_IMAGE" >> synced-images.txt
-
               # Replace original image with ECR image in the YAML
               sed -i "s|$image|$TARGET_IMAGE|g" "$file"
-
-              mv "$file" confluent-platform-kraft.yaml
-              rm "$file"
               # Uncomment for real copy:
               # skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
             done
-
             echo "✅ Updated $file with ECR images"
           done < new_files.txt
-
-          cd ../
-
       - name: Update last seen SHA
         run: |
           cp files_list.txt $LAST_SEEN_FILE
@@ -85,15 +68,13 @@ jobs:
           git config --local user.name "GitHub Action"
           git add $LAST_SEEN_FILE
           git commit -m "Update last seen SHA" || echo "No changes to commit"
-
       - name: Commit updated YAMLs
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add confluent-platform-manifests_files/confluent-platform-kraft.yaml
+          git add *.yaml
           git commit -m "Update Confluent YAMLs with ECR images" || echo "No changes to commit"
           git push || echo "Nothing to push"
-
       - name: Commit synced images list
         run: |
           git config --local user.email "action@github.com"
