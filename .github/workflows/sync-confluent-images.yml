@@ -66,6 +66,7 @@ jobs:
               # Replace original image with ECR image in the YAML
               sed -i "s|$image|$TARGET_IMAGE|g" "$file"
 
+              mv "$file" confluent-platform-manifests_files/confluent-platform-kraft.yaml
               # Uncomment for real copy:
               # skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
             done
@@ -85,7 +86,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add *.yaml
+          git add confluent-platform-manifests_files/confluent-platform-kraft.yaml
           git commit -m "Update Confluent YAMLs with ECR images" || echo "No changes to commit"
           git push || echo "Nothing to push"
 
