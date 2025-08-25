@@ -6,8 +6,8 @@ metadata:
 spec:
   dataVolumeCapacity: 10G
   image:
-    application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-server:8.0.0
-    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
+    application: docker.io/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-server:8.0.0
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
   replicas: 3
 ---
 apiVersion: platform.confluent.io/v1beta1
@@ -19,7 +19,7 @@ spec:
   replicas: 3
   image:
     application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-server:8.0.0
-    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
   dataVolumeCapacity: 10Gi
   dependencies:
     kRaftController:
@@ -40,7 +40,7 @@ spec:
   replicas: 2
   image:
     application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-server-connect:8.0.0
-    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
@@ -57,7 +57,7 @@ spec:
   replicas: 1
   image:
     application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-enterprise-replicator:8.0.0
-    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
@@ -73,7 +73,7 @@ spec:
   replicas: 2
   image:
     application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-ksqldb-server:8.0.0
-    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
   dataVolumeCapacity: 10Gi
   podTemplate:
     podSecurityContext:
@@ -90,7 +90,7 @@ spec:
   replicas: 1
   image:
     application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-enterprise-control-center:8.0.0
-    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
   dataVolumeCapacity: 10Gi
   podTemplate:
     podSecurityContext:
@@ -123,7 +123,7 @@ spec:
   replicas: 2
   image:
     application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-schema-registry:8.0.0
-    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
@@ -141,7 +141,7 @@ spec:
       url: http://schemaregistry.confluent.svc.cluster.local:8081
   image:
     application: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/cp-kafka-rest:8.0.0
-    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
+    init: 141884504154.dkr.ecr.ap-southeast-1.amazonaws.com/confluentinc/confluent-init-container:3.0.0
   replicas: 2
   podTemplate:
     podSecurityContext:
