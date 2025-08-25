@@ -14,6 +14,7 @@ jobs:
       AWS_REGION: "<your-aws-region>"
       AWS_ACCOUNT_ID: "<your-aws-account-id>"
       ECR_REPO_PREFIX: "<your-ecr-repo-prefix>"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -42,20 +43,48 @@ jobs:
 
       - name: Process new files and copy images
         run: |
+          > synced-images.txt   # reset each run (remove if you want to keep history)
           while read -r file sha url; do
             echo "Processing $file"
             curl -s -O "$url"
 
-            # Extract all images (application, init, services)
+            # Extract all images
             IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file")
-
             for image in $IMAGES; do
               echo "Copying $image to AWS ECR"
               IMAGE_NAME=$(basename $image)
               TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
+
+              # Log to console
               echo $TARGET_IMAGE
-            #   skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE              
+
+              # Save to file
+              echo $TARGET_IMAGE >> synced-images.txt
+
+              # Uncomment for real copy:
+              # skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
             done
+          done < new_files.txt
+
+      - name: Rewrite YAMLs with ECR images
+        run: |
+          while read -r file sha url; do
+            echo "Rewriting $file with ECR image URLs"
+
+            # Ensure we have the YAML locally
+            if [ ! -f "$file" ]; then
+              curl -s -O "$url"
+            fi
+
+            IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file")
+            for image in $IMAGES; do
+              IMAGE_NAME=$(basename $image)
+              TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
+              echo "Replacing $image → $TARGET_IMAGE"
+              yq eval -i "(.. | select(has(\"image\")) | .image |= sub(\"$image\"; \"$TARGET_IMAGE\"))" "$file"
+            done
+
+            echo "✅ Updated $file"
           done < new_files.txt
 
       - name: Update last seen SHA
@@ -65,4 +94,19 @@ jobs:
           git config --local user.name "GitHub Action"
           git add $LAST_SEEN_FILE
           git commit -m "Update last seen SHA" || echo "No changes to commit"
+
+      - name: Commit updated YAMLs
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *.yaml
+          git commit -m "Update Confluent YAMLs with ECR images" || echo "No changes to commit"
           git push || echo "Nothing to push"
+
+      - name: Commit synced images list
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add synced-images.txt
+          git commit -m "Track synced ECR images for $(date -u +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push || echo "Nothing to push"          
