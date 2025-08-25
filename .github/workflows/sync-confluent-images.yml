@@ -50,25 +50,24 @@ jobs:
             # Download YAML if not already present
             curl -sf -O "$url"
 
-            # Extract all images
-            IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file")
+            # Extract all images and keep unique entries
+            IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file" | sort -u)
 
             for image in $IMAGES; do
-              echo "Copying $image to AWS ECR"
               IMAGE_NAME=$(basename "$image")
               TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
 
               # Log to console
-              echo $TARGET_IMAGE
+              echo "Copying $image → $TARGET_IMAGE"
 
-              # Save to synced-images.txt for future reference
-              echo $TARGET_IMAGE >> synced-images.txt
+              # Save to synced-images.txt, avoid duplicates
+              grep -qxF "$TARGET_IMAGE" synced-images.txt || echo "$TARGET_IMAGE" >> synced-images.txt
+
+              # Replace original image with ECR image in the YAML
+              sed -i "s|$image|$TARGET_IMAGE|g" "$file"
 
               # Uncomment for real copy:
               # skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
-
-              # Replace original image with ECR image in the YAML directly
-              sed -i "s|$image|$TARGET_IMAGE|g" "$file"
             done
 
             echo "✅ Updated $file with ECR images"
