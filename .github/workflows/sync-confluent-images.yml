@@ -1,0 +1,84 @@
+name: Sync Confluent Images to ECR
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # daily at 02:00 UTC
+  workflow_dispatch:           # manual trigger
+
+jobs:
+  sync-images:
+    runs-on: ubuntu-latest
+    env:
+      REPO_API: "https://api.github.com/repos/confluentinc/confluent-kubernetes-examples/contents/general/cp-version"
+      LAST_SEEN_FILE: "last_seen_sha.txt"
+      AWS_REGION: "ap-southeast-1"
+      AWS_ACCOUNT_ID: "141884504154"
+      ECR_REPO_PREFIX: "confluentinc"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget curl git jq skopeo
+          # Remove old Python yq if exists
+          sudo pip uninstall -y yq || true
+          # Install Go yq v4
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+          yq --version
+      - name: Fetch YAML list from Confluent GitHub
+        run: |
+          curl -s $REPO_API | jq -r '.[] | select(.name | test("confluent-platform-kraft-.*\\.yaml")) | "\(.name) \(.sha) \(.download_url)"' > files_list.txt
+      - name: Detect new files
+        run: |
+          touch $LAST_SEEN_FILE
+          awk 'NR==FNR{seen[$2]; next} !($2 in seen)' "$LAST_SEEN_FILE" files_list.txt > new_files.txt
+          echo "New files to process:"
+          cat new_files.txt
+      - name: Process new files and copy images
+        run: |
+          > synced-images.txt   # reset each run
+          while read -r file sha url; do
+            echo "Processing $file"
+            # Download YAML if not already present
+            curl -sf -O "$url"
+            # Extract all images and keep unique entries
+            IMAGES=$(yq eval '[.. | select(has("image")) | .image | .. | select(tag == "!!str")] | unique | .[]' "$file" | sort -u)
+            for image in $IMAGES; do
+              IMAGE_NAME=$(basename "$image")
+              TARGET_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_PREFIX/$IMAGE_NAME"
+              # Log to console
+              echo "Copying $image → $TARGET_IMAGE"
+              # Save to synced-images.txt, avoid duplicates
+              grep -qxF "$TARGET_IMAGE" synced-images.txt || echo "$TARGET_IMAGE" >> synced-images.txt
+              # Replace original image with ECR image in the YAML
+              sed -i "s|$image|$TARGET_IMAGE|g" "$file"
+              # Uncomment for real copy:
+              # skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
+            done
+            echo "✅ Updated $file with ECR images"
+          done < new_files.txt
+      - name: Update last seen SHA
+        run: |
+          cp files_list.txt $LAST_SEEN_FILE
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add $LAST_SEEN_FILE
+          git commit -m "Update last seen SHA" || echo "No changes to commit"
+      - name: Commit updated YAMLs
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *.yaml
+          git commit -m "Update Confluent YAMLs with ECR images" || echo "No changes to commit"
+          git push || echo "Nothing to push"
+      - name: Commit synced images list
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add synced-images.txt
+          git commit -m "Track synced ECR images for $(date -u +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push || echo "Nothing to push"          

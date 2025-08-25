@@ -1,0 +1,2 @@
+c3admin: password,Administrators
+c3readonly: password,Readonly
