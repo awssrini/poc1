@@ -47,6 +47,7 @@ jobs:
           while read -r file sha url; do
             echo "Processing $file"
 
+            cd confluent-platform-manifests_files
             # Download YAML if not already present
             curl -sf -O "$url"
 
@@ -66,13 +67,16 @@ jobs:
               # Replace original image with ECR image in the YAML
               sed -i "s|$image|$TARGET_IMAGE|g" "$file"
 
-              mv "$file" confluent-platform-manifests_files/confluent-platform-kraft.yaml
+              mv "$file" confluent-platform-kraft.yaml
+              rm "$file"
               # Uncomment for real copy:
               # skopeo copy --insecure-policy docker://$image docker://$TARGET_IMAGE
             done
 
             echo "✅ Updated $file with ECR images"
           done < new_files.txt
+
+          cd ../
 
       - name: Update last seen SHA
         run: |
