@@ -1,0 +1,5 @@
+confluent-platform-kraft-7.6.0.yaml 024a1b14ed98b487310901a4d7e5227e364eb688 https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/general/cp-version/confluent-platform-kraft-7.6.0.yaml
+confluent-platform-kraft-7.7.0.yaml 1f5e343abf81e9c810c7659242bb214e3c358baf https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/general/cp-version/confluent-platform-kraft-7.7.0.yaml
+confluent-platform-kraft-7.8.0.yaml d609495d1ea083c6cbc578aa64c463d715f28a15 https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/general/cp-version/confluent-platform-kraft-7.8.0.yaml
+confluent-platform-kraft-7.9.0.yaml d10042cf72c4df7f3847f80bf922bf1abaaace7c https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/general/cp-version/confluent-platform-kraft-7.9.0.yaml
+confluent-platform-kraft-8.0.0.yaml 9133467802f662d20382ecdf46fdb347e593cff2 https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/general/cp-version/confluent-platform-kraft-8.0.0.yaml
